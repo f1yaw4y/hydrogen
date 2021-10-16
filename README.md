@@ -14,9 +14,4 @@ _________________
 
 When run for the first time, you can installing or "bypass" ONLY if you change directory from default (/home/user)
 
-Seems simple to me but I coded it so maybe not haha. I had fun coding this and any replies on improving would be appreciated. Repairs, additions, removal, etc.
-I have about 2 days experience in Bash scripts so far
-
-V2.0 Beta include metadata remover, better design for public use, and first bugs removed (features fail)
-
 Thank you and enjoy (:
