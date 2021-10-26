@@ -15,3 +15,7 @@ _________________
 When run for the first time, you can installing or "bypass" ONLY if you change directory from default (/home/user)
 
 Thank you and enjoy (:
+
+**********Update Log************
+V2.0 - Installs in hydrogen folder if possible instead of home folder
+     - More Software support
