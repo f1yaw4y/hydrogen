@@ -44,7 +44,7 @@ while (( --count >= 0 )); do
     clear
   sleep 1s
 done
-    cd
+    cd $global_dir
     sudo apt-get update
     proton_installer
     cupp_installer
@@ -66,7 +66,7 @@ done
 
     sudo apt-get update
     sudo apt-get upgrade
-
+    cd $global_dir
     touch System_Installed
     clear
     echo "The system has been installed successfully."
@@ -333,10 +333,11 @@ function lscript_installer() {
     sleep 3s
 }
 function lscript() {
-    current_program="$global_dir/lscript/l.sh"
+    current_program="$global_dir/lscript/l"
     app_check
     cd $global_dir/lscript
-    xterm -hold -e 'sudo ./l.sh'
+    #xterm -hold -e 'sudo ./l'
+    gnome-terminal -- sudo ./l
 }
 
 function sdrtrunk_installer() {
@@ -498,96 +499,30 @@ function payload() {
     sudo ./autometer.sh
 }
 
-function graphene_installer() {
-    clear
-    logo
-    echo "Which Pixel are you flashing? "
-    echo "1. Pixel 2" # wallaye
-    echo "2. Pixel 2 XL" # taimen
-    echo "3. Pixel 3" # blueline
-    echo "4. Pixel 3 XL" # crosshatch
-    echo "5. Pixel 3a" # sargo
-    echo "6. Pixel 4" # flame
-    echo "7. Pixel 4 XL" # coral
-    echo "8. Pixel 4a" # sunfish
-    echo ""
-    read -p "Select Model > " pixel_model
-    clear
+#!/bin/bash
 
-    echo "Please ensure that 'OEM unlocking' and 'USB Debugging' are enabled"
-    sleep 3s
+function logo_g() {
+echo -e "\033[0;34m          |             "
+echo "          |             "
+echo "          O             "
+echo "   \    /   \   /      "
+echo "    \  /     \ /       "
+echo "      O       O         "
+echo -e " \033[0;34m     |       |    \033[0;32mGrapheneOS Security    "
+echo -e "  \033[0;34m    |       |          "
+echo -e "  \033[0;34m    O       O         "
+echo -e "     /  \    / \         \033[0;32mFree your Pixel >>    "
+echo -e " \033[0;34m   /    \  /   \      "
+echo "          O             "
+echo "          |             "
+echo -e "          |       \033[1;31m                    Coded by ~flyaway~      "
+echo -e "\033[1;37m---------------------------------------------------------"
+}
 
-
-      echo "Downloading GrapheneOS. . ."
-    sleep 2s
-    cd $global_dir
-    case $pixel_model in
-        
-        1)
-            # Pixel 2
-            curl -O https://releases.grapheneos.org/walleye-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/walleye-factory-2021.06.09.13.zip.sig
-        ;;
-        
-        2)
-            # Pixel 2 XL
-            curl -O https://releases.grapheneos.org/taimen-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/taimen-factory-2021.06.09.13.zip.sig
-        ;;
-
-        3) 
-            # Pixel 3
-            curl -O https://releases.grapheneos.org/blueline-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/blueline-factory-2021.06.09.13.zip.sig
-        ;;
-
-        4)
-            # Pixel 3 XL
-            curl -O https://releases.grapheneos.org/crosshatch-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/crosshatch-factory-2021.06.09.13.zip.sig
-        ;;
-
-        5)
-            # Pixel 3a
-            curl -O https://releases.grapheneos.org/sargo-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/sargo-factory-2021.06.09.13.zip.sig
-        ;;
-
-        6)
-            # Pixel 4
-            curl -O https://releases.grapheneos.org/flame-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/flame-factory-2021.06.09.13.zip.sig
-        ;;
-
-        7)
-            # Pixel 4 XL
-            curl -O https://releases.grapheneos.org/coral-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/coral-factory-2021.06.09.13.zip.sig
-        ;;
-        
-        8)
-            # Pixel 4a
-            curl -O https://releases.grapheneos.org/sunfish-factory-2021.06.09.13.zip
-            curl -O https://releases.grapheneos.org/sunfish-factory-2021.06.09.13.zip.sig
-        ;;
-        
-        
-        
-        
-
-    esac
-
-
-
-    echo "Checking for platform-tools. . ."
-
-    if [ -d "$global_dir/platform-tools" ]
-then
-    echo "Tools exist"
-    sleep 3s
-
-    echo "Please boot phone into recovery (Reboot and hold volume down)"
-    read -n 1 -s -r -p "Press any key when your phone is connected in recovery"
+function flash_process() {
+    echo "Please boot phone into recovery"
+    echo "**Reboot and then hold volume down until you're in recovery"
+    read -n 1 -s -r -p "Press any key when your phone is connected and in recovery"
     clear
     echo "Unlocking Bootloader. . ."
     fastboot flashing unlock
@@ -595,8 +530,10 @@ then
     echo "Downloading verification key. . ."
     curl -O https://releases.grapheneos.org/factory.pub
 
-    read -p "Drag Firmware here > " frmware_path
+    read -p "Drag .zip firmware package here > " frmware_path
     signify -Cqp factory.pub -x  $frmware_path && echo verified
+    sleep 3s
+    echo "Make sure it says 'verified'"
 
     echo "Extracting Image. . ."
     bsdtar xvf $frmware_path
@@ -605,9 +542,64 @@ then
     echo "Flashing. . ."
     cd $extracted_frmware
     ./flash-all.sh
-    sleep 10s
+    read -n 1 -s -r -p "Press any key when your phone is back in recovery/bootloader"
+
     echo "Complete. Re-Locking Bootloader. . ."
     fastboot flashing lock
+    sleep 5s
+
+    clear
+    logo
+    echo "Congradulations! You are free to reboot and setup your new device. Enjoy GrapheneOS"
+}
+
+function menu_g() {
+    clear
+logo_g
+    echo "Which Pixel are you flashing? "
+    echo "|Pixel 3 (blueline)            | Pixel 4 (flame)         | 9. Pixel 5 (redfin)" 
+    echo "|Pixel 3 XL (crosshatch)       | Pixel 4 XL (coral)      | 10.Pixel 5a (barbet)" 
+    echo "|Pixel 3a (sargo)              | Pixel 4a (sunfish)                  " 
+    echo "|Pixel 3a XL (bonito)          | Pixel 4a 5G (bramble)               "
+    echo "                                                         |Manual Unlock Bootloader: 'unlock'"
+    echo "|Main Menu (m)                                           |Manual Lock Bootloader: 'lock'"
+    
+}
+
+function options() {
+    read -p "Codename or option > " pixel_model
+    case $pixel_model in
+
+    unlock)
+        fastboot flashing unlock; menu_g; options ;;
+    lock)
+        fastboot flashing lock; menu_g; options ;;
+    m) main_menu2
+    esac
+
+
+    read -p "Select Firmware Version (ex. 2021.06.09.13) > " date_picked
+    read -p "Enter Install Directory > " global_dir
+    clear
+
+    echo -e "\033[0;31m'Please ensure that 'OEM unlocking' and 'USB Debugging' are enabled"
+    sleep 5s
+
+
+      echo "Downloading GrapheneOS. . ."
+    sleep 2s
+
+    curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip
+    curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip.sig
+
+    echo "Checking for platform-tools. . ."
+
+    if [ -d "$global_dir/platform-tools" ]
+then
+    echo "Tools exist"
+    sleep 3s
+
+    flash_process
 else
     echo "Tools don't exist"
     sleep 2s
@@ -627,30 +619,23 @@ else
 
     echo "Script can continue"
     sleep 2s
-    read -n 1 -s -r -p "Press any key when your phone is connected"
-    clear
-    echo "Unlocking Bootloader. . ."
-    fastboot flashing unlock
-
-    echo "Downloading verification key. . ."
-    curl -O https://releases.grapheneos.org/factory.pub
-
-    read -p "Drag Firmware here > " frmware_path
-    signify -Cqp factory.pub -x  $frmware_path && echo verified
-
-    echo "Extracting Image. . ."
-    bsdtar xvf $frmware_path
-    read -p "Drag extracted firmware folder here > " extracted_frmware
-
-    echo "Flashing. . ."
-    cd $extracted_frmware
-    ./flash-all.sh
-    sleep 10s
-    echo "Complete. Re-Locking Bootloader. . ."
-    fastboot flashing lock
+    flash_process
 fi
+}
+
+function graphene_installer() {
+    logo_g
+    menu_g
+    options
+
+
+echo "Script complete! For issues or to attempt manual CLI install,"
+echo "visit https://grapheneos.org/install/cli"
 
 }
+
+
+
 
 function anti_logo() {
 echo "     _          _   _       _                "
@@ -857,7 +842,7 @@ function img_decrypt() {
 }
 
 function logo() {
-    echo "╔╗─╔╗─────╔╗──────  ─  ─"
+    echo -e "\033[0;32m╔╗─╔╗─────╔╗──────  ─  ─"
     echo "║║─║║─────║║──────────── ─  ─"
     echo "║╚═╝╠╗─╔╦═╝╠═╦══╦══╦══╦═╗ ─  ─"
     echo "║╔═╗║║─║║╔╗║╔╣╔╗║╔╗║║═╣╔╗╗─────── ─  ─"
@@ -915,7 +900,7 @@ function hacks() {
     echo "Hax Menu"
     echo "________________________________________"
     echo "1. Payload_Generator"
-    echo "2. CUPP"
+    echo "2. DIY Password List - cupp"
     echo "3 EagleEye"
     echo "4. Fluxion"
     echo "5. ehtools"
@@ -928,6 +913,7 @@ function hacks() {
     echo "12. wifite2"
     echo "13. WiFi Pineapple"
     echo "14. xerosploit"
+    echo "15. Airgeddon"
     nav
     echo ""
     read -p "Hydro > " opt3
@@ -947,6 +933,7 @@ function hacks() {
     12) wifite2; hacks ;;
     13) pineapple; hacks ;;
     14) xerosploit; hacks ;;
+    15) airgeddon ;;
     b) main_menu2 ;;
     q) cover_and_leave ;;
     m) main_menu2 ;;
@@ -1127,6 +1114,10 @@ function reload() {
     $global_dir/Desktop/Hydrogen.sh
 }
 
+function network_tools() {
+    echo "hello"
+}
+
 main_menu() {
     clear
     logo
@@ -1153,12 +1144,14 @@ main_menu2() {
     echo -e "Working directory set to:\033[0;31m" $global_dir #&& echo -n "/home/" && echo $global_user
     echo -e "\033[0m.______________________________________________________________________."
     echo "|                                                                      |"
-    echo "|  1. | ProtonVPN                   7. | Security                      |"
-    echo "|  2. | Kalitorify                  8. | Hax Scripts                   |"
-    echo "|  3. | TorBrowser                  9. | Other tools                   |"
-    echo "|  4. | Network Switch              10.| Advanced                      |"
-    echo "|  5. | Cleanup                     11.| Network Diagnos               |"
-    echo "|  6. | DIY Backdoor                12.| ISO > USB                     |"
+    echo "|  1. | ProtonVPN                   8. | Security                      |"
+    echo "|  2. | Kalitorify                  9. | Hax Scripts                   |"
+    echo "|  3. | TorBrowser                  10.| Other tools                   |"
+    echo "|  4. | Network Switch              11.| Advanced                      |"
+    echo "|  5. | Cleanup                     12.| Network Diagnos               |"
+    echo "|  6. | DIY Backdoor                13.| ISO > USB                     |"
+    echo "|  7. | Local Network Tools                                            |"
+
     echo ".----------------------------------------------------------------------."
     if [ -f "$global_dir/System_Installed" ]
         then
@@ -1179,12 +1172,13 @@ main_menu2() {
     4) network_manager; main_menu2 ;;
     5) cover; main_menu2 ;;
     6) payload_tool; main_menu2 ;;
-    7) security_menu ; main_menu2 ;;
-    8) hacks ; main_menu2 ;;
-    9) other ;;
-    10) advanced ;;
-    11) diagnos_net; main_menu2 ;;
-    12) iso; main_menu2 ;;
+    7) network_tools; main_menu2 ;; 
+    8) security_menu ; main_menu2 ;;
+    9) hacks ; main_menu2 ;;
+    10) other ;;
+    11) advanced ;;
+    12) diagnos_net; main_menu2 ;;
+    13) iso; main_menu2 ;;
     s) shutdown_cover ;;
     q) cover_and_leave ;;
     4) reload ;;
@@ -1212,7 +1206,7 @@ function loading() {
     sleep 0.5s
     echo -e "\033[0m────╔═╝║────────╔═╝║                     \033[0;31m     << BackTrack <<\033[0m"
     sleep 0.5s
-    echo -e "\033[0m────╚══╝────────╚══╝   Version 1.3 BETA"
+    echo -e "\033[0m────╚══╝────────╚══╝   Version 2.0 BETA"
     echo -e "\033[0mDeveloped by Flyaway"
     echo ""
     sleep 0.5s
@@ -1222,7 +1216,10 @@ function startup() {
 echo -n -e "\033[0;34mEnter Linux Username >\033[0m" && read -p " " kaliuser
 global_user=$kaliuser
 global_dir="/home/"$global_user
-echo -n -e "\033[0;31mChecking installed software in \033[0m" && echo $global_dir
+global_dir=$global_dir"/hydrogen"
+echo "$global_dir"
+sleep 10s
+echo -n -e "\033[0;31mNecessary files found in \033[0m" && echo $global_dir
 
 
 if [ -f "$global_dir/System_Installed" ]
