@@ -46,6 +46,7 @@ while (( --count >= 0 )); do
 done
     cd $global_dir
     sudo apt-get update
+    misc_installers
     proton_installer
     cupp_installer
     eagleeye_installer
@@ -66,8 +67,9 @@ done
 
     sudo apt-get update
     sudo apt-get upgrade
+    sudo chmod +rwx $global_dir
     cd $global_dir
-    touch System_Installed
+    sudo touch System_Installed
     clear
     echo "The system has been installed successfully."
     sleep 2s
@@ -85,6 +87,13 @@ done
         esac
         fi
 
+}
+
+function misc_installers() {
+sudo apt-get install chkrootkit
+sudo apt-get install aide
+sudo apt-get install logcheck
+sudo apt-get install htop
 }
 
 function b2e_installer() {
@@ -152,8 +161,13 @@ function proton_installer() {
     echo "Installing Proton VPN"
     sleep 2s
     cd $global_dir
-    sudo wget https://protonvpn.com/download/protonvpn-stable-release_1.0.0-1_all.deb
-    sudo dpkg -i protonvpn-stable-release_1.0.0-1_all.deb; sudo apt-get install -f
+    read -p "Enter Package Name to Download (Example: https://protonvpn.com/download/protonvpn-stable-release_1.0.0-1_all.deb): " proton_package
+    #sudo wget https://protonvpn.com/download/protonvpn-stable-release_1.0.3_all.deb
+    #sudo dpkg -i protonvpn-stable-release_1.0.0-1_all.deb; sudo apt-get install -f
+    sudo wget $proton_package
+    echo "Package downloaded"
+    read -p "Type package name from $global_dir here: " proton_package_local
+    sudo dpkg -i $proton_package_local; sudo apt-get install -f
     sudo apt-get update
     sudo apt-get install protonvpn
     sleep 3s
@@ -232,7 +246,9 @@ function fluxion_installer() {
     sudo git clone https://github.com/FluxionNetwork/fluxion.git
     cd fluxion
     sudo chmod +x fluxion.sh
-    gnome-terminal -- sudo $global_dir/fluxion/fluxion.sh
+    echo "Installing dependencies..."
+    sleep 2s
+    gnome-terminal -- sudo $global_dir/fluxion/fluxion.sh -i
     clear
     echo "Fluxion Installed Successfully"
     sleep 3s
@@ -420,12 +436,16 @@ function pineapple() {
 
 function xerosploit_installer() {
     clear
+    echo "Installing python-pip dependency"
+    sudo apt-get install python-pip
     echo "Installing xerosploit"
     sleep 2s
     cd $global_dir
     sudo git clone https://github.com/LionSec/xerosploit.git
-    cd xerosploit
-    xterm -hold -e 'sudo python install.py'
+    
+    #cd xerosploit
+    xterm -hold -e 'cd xerosploit && sudo python install.py'
+    #xterm -hold -e 'sudo python install.py'
     clear
     echo "Xerosploit Installed"
     sleep 3s
@@ -520,6 +540,7 @@ echo -e "\033[1;37m---------------------------------------------------------"
 }
 
 function flash_process() {
+    clear
     echo "Please boot phone into recovery"
     echo "**Reboot and then hold volume down until you're in recovery"
     read -n 1 -s -r -p "Press any key when your phone is connected and in recovery"
@@ -530,14 +551,16 @@ function flash_process() {
     echo "Downloading verification key. . ."
     curl -O https://releases.grapheneos.org/factory.pub
 
-    read -p "Drag .zip firmware package here > " frmware_path
-    signify -Cqp factory.pub -x  $frmware_path && echo verified
+    #read -p "Drag .zip firmware package here > " frmware_path
+    #signify -Cqp factory.pub -x  $frmware_path && echo verified
+    signify -Cqp factory.pub -x $firmware_os
     sleep 3s
     echo "Make sure it says 'verified'"
 
     echo "Extracting Image. . ."
-    bsdtar xvf $frmware_path
-    read -p "Drag extracted firmware folder here > " extracted_frmware
+    #bsdtar xvf $frmware_path
+    bsdtar xvf $firmware_os
+    read -p "Drag extracted firmware folder here (or enter without quotes) > " extracted_frmware
 
     echo "Flashing. . ."
     cd $extracted_frmware
@@ -556,13 +579,15 @@ function flash_process() {
 function menu_g() {
     clear
 logo_g
-    echo "Which Pixel are you flashing? "
-    echo "|Pixel 3 (blueline)            | Pixel 4 (flame)         | 9. Pixel 5 (redfin)" 
-    echo "|Pixel 3 XL (crosshatch)       | Pixel 4 XL (coral)      | 10.Pixel 5a (barbet)" 
-    echo "|Pixel 3a (sargo)              | Pixel 4a (sunfish)                  " 
-    echo "|Pixel 3a XL (bonito)          | Pixel 4a 5G (bramble)               "
-    echo "                                                         |Manual Unlock Bootloader: 'unlock'"
-    echo "|Main Menu (m)                                           |Manual Lock Bootloader: 'lock'"
+    echo "Which Pixel are you flashing? (**=obsolete/no longer supported)"
+    echo "|Pixel 3 (blueline)**      |Pixel 4 (flame)        |Pixel 5 (redfin)" 
+    echo "|Pixel 3 XL (crosshatch)** |Pixel 4 XL (coral)     |Pixel 5a (barbet)" 
+    echo "|Pixel 3a (sargo)**        |Pixel 4a (sunfish)     |Pixel 6 (oriole)" 
+    echo "|Pixel 3a XL (bonito)**    |Pixel 4a 5G (bramble)  |Pixel 6a (bluejay"
+    echo "|Pixel 7 (Panther)                                 |Pixel 6 Pro (raven)"
+    echo "|Pixel 7 Pro (cheetah)"
+    echo "                           |Manual Unlock Bootloader: 'unlock'"
+    echo "|Main Menu (m)             |Manual Lock Bootloader: 'lock'"
     
 }
 
@@ -589,19 +614,21 @@ function options() {
       echo "Downloading GrapheneOS. . ."
     sleep 2s
 
-    curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip
-    curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip.sig
+    sudo curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip
+    firmware_os="https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip"
+    sudo curl -O https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip.sig
+    firmware_sig="https://releases.grapheneos.org/$pixel_model-factory-$date_picked.zip.sig"
 
     echo "Checking for platform-tools. . ."
 
     if [ -d "$global_dir/platform-tools" ]
 then
-    echo "Tools exist"
+    echo "Platform Tools Exist"
     sleep 3s
 
     flash_process
 else
-    echo "Tools don't exist"
+    echo "Platform Tools don't exist"
     sleep 2s
     echo "Installing . . ."
     cd $global_dir
@@ -612,6 +639,9 @@ else
 
     echo "Adding to PATH. . ."
     export PATH="$PWD/platform-tools:$PATH"
+    sleep 1s
+    echo "Flashing as non-root"
+    sudo apt install android-sdk-platform-tools-common
 
     echo "Installing signify. . ."
     sudo apt install signify-openbsd
@@ -1117,6 +1147,21 @@ function reload() {
 function network_tools() {
     echo "hello"
 }
+ function mitm() {
+ clear
+ echo "Checking for dnsniff..."
+ sudo apt install dsniff
+ sleep 2s
+ clear
+ echo "Done"
+ echo 1s
+ clear
+ read -p "Enter your Network Adapter (wlan0, eth0, etc): " netAdapter
+ read -p "Enter your IP: " localIP
+ read -p "Enter target IP: " targetIP
+ read -p "Enter gateway IP: " gatewayIP
+ xterm -hold -e 'arpspoof -i $netAdapter -t $targetIP $gatewayIP'
+ }
 
 main_menu() {
     clear
@@ -1124,6 +1169,7 @@ main_menu() {
     echo ""
     echo "Type 'install' For Full System Install"
     echo "*Typing 'bypass' will skip the full install"
+    echo "If you are sure you have all files, type 'proceed'"
     echo ""
     echo ""
     echo "- - -"
@@ -1133,6 +1179,7 @@ main_menu() {
     case $opt1 in
     install) install ; main_menu2 ;;
     bypass) main_menu2 ;;
+    proceed) sudo touch System_Installed; main_menu2;;
     esac
 }
 
@@ -1145,12 +1192,12 @@ main_menu2() {
     echo -e "\033[0m.______________________________________________________________________."
     echo "|                                                                      |"
     echo "|  1. | ProtonVPN                   8. | Security                      |"
-    echo "|  2. | Kalitorify                  9. | Hax Scripts                   |"
+    echo "|  2. | Kalitorify                  9. | Pentest                       |"
     echo "|  3. | TorBrowser                  10.| Other tools                   |"
     echo "|  4. | Network Switch              11.| Advanced                      |"
     echo "|  5. | Cleanup                     12.| Network Diagnos               |"
     echo "|  6. | DIY Backdoor                13.| ISO > USB                     |"
-    echo "|  7. | Local Network Tools                                            |"
+    echo "|  7. | Local Network Tools         14.| MITM                          |"
 
     echo ".----------------------------------------------------------------------."
     if [ -f "$global_dir/System_Installed" ]
@@ -1179,6 +1226,7 @@ main_menu2() {
     11) advanced ;;
     12) diagnos_net; main_menu2 ;;
     13) iso; main_menu2 ;;
+    14) mitm; main_menu2 ;;
     s) shutdown_cover ;;
     q) cover_and_leave ;;
     4) reload ;;
@@ -1206,7 +1254,7 @@ function loading() {
     sleep 0.5s
     echo -e "\033[0m────╔═╝║────────╔═╝║                     \033[0;31m     << BackTrack <<\033[0m"
     sleep 0.5s
-    echo -e "\033[0m────╚══╝────────╚══╝   Version 2.0 BETA"
+    echo -e "\033[0m────╚══╝────────╚══╝   Version 2.2 BETA"
     echo -e "\033[0mDeveloped by Flyaway"
     echo ""
     sleep 0.5s
@@ -1218,13 +1266,14 @@ global_user=$kaliuser
 global_dir="/home/"$global_user
 global_dir=$global_dir"/hydrogen"
 echo "$global_dir"
-sleep 10s
-echo -n -e "\033[0;31mNecessary files found in \033[0m" && echo $global_dir
 
 
 if [ -f "$global_dir/System_Installed" ]
 then
-sleep 2s
+sleep 1s
+echo -n -e "\033[0;31mNecessary files found in \033[0m" && echo $global_dir
+echo "Proceeding to Main Menu..."
+sleep 5s
 main_menu2
 else
 main_menu
