@@ -1,6 +1,7 @@
 # hydrogen
 
-![Screenshot_2021-10-15_22-56-37](https://user-images.githubusercontent.com/91309101/137571124-46431225-4a75-4e3d-9f3b-793e8438bfe9.png)
+![H_login](https://user-images.githubusercontent.com/91309101/230177239-3e4b1a8e-5eb5-4350-a9c2-77ccca1a334f.png)
+![H_main](https://user-images.githubusercontent.com/91309101/230177253-6e74d1ef-b2a8-408d-8893-1958dcfdaa58.png)
 
 
 Useful AIO script for installing and launching various security and pentesting apps
@@ -19,3 +20,8 @@ Thank you and enjoy (:
 **********Update Log************
 V2.0 - Installs in hydrogen folder if possible instead of home folder
      - More Software support
+**********************************************************************
+V2.2
+     -Improved stability and bug fixes
+     -Added OSINT category (Work in progress)
+     -Added MITM category (Work in progress)
