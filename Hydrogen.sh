@@ -48,6 +48,7 @@ done
     sudo apt-get update
     misc_installers
     proton_installer
+    airgeddon_installer
     cupp_installer
     eagleeye_installer
     fluxion_installer
@@ -70,6 +71,7 @@ done
     sudo chmod +rwx $global_dir
     cd $global_dir
     sudo touch System_Installed
+    sudo chmod _rwx %global_dir/Hydrogen.sh
     clear
     echo "The system has been installed successfully."
     sleep 2s
@@ -94,6 +96,10 @@ sudo apt-get install chkrootkit
 sudo apt-get install aide
 sudo apt-get install logcheck
 sudo apt-get install htop
+}
+
+function airgeddon_installer() {
+sudo apt-get install airgeddon
 }
 
 function b2e_installer() {
