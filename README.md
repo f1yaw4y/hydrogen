@@ -1,4 +1,5 @@
 # hydrogen
+###Currently working on a better written script with a re-structured directory and general improvements
 
 ![H_login](https://user-images.githubusercontent.com/91309101/230177239-3e4b1a8e-5eb5-4350-a9c2-77ccca1a334f.png)
 ![H_main](https://user-images.githubusercontent.com/91309101/230177253-6e74d1ef-b2a8-408d-8893-1958dcfdaa58.png)
